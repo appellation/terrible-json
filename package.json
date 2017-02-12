@@ -1,0 +1,22 @@
+{
+  "name": "terrible-json",
+  "version": "0.1.0",
+  "description": "A terrible JSON database system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appellation/terrible-json.git"
+  },
+  "author": "Will Nelson <appellation@topkek.pw>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/appellation/terrible-json/issues"
+  },
+  "homepage": "https://github.com/appellation/terrible-json#readme",
+  "dependencies": {
+    "queue": "^4.0.0"
+  }
+}
