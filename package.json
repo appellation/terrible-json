@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/appellation/terrible-json#readme",
   "dependencies": {
+    "proper-lockfile": "^2.0.0",
     "queue": "^4.0.0"
   }
 }

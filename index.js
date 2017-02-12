@@ -1,5 +1,6 @@
 const fs = require('fs');
 const p = require('path');
+const lockfile = require('proper-lockfile');
 const queue = require('queue');
 
 class QueueManager  {
@@ -34,10 +35,16 @@ module.exports = (file, data, options) => {
 
     return new Promise((resolve, reject) => {
         manager.add(path, cb => {
-            fs.writeFile(path, json, (err) => {
-                if(err) reject(err);
-                else resolve();
-                cb();
+            lockfile.lock(path, (err, release) => {
+                if(err) return reject(err);
+
+                fs.writeFile(path, json, (err) => {
+                    if(err) reject(err);
+                    else resolve();
+
+                    release();
+                    cb();
+                });
             });
         });
     });
