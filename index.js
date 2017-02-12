@@ -30,7 +30,7 @@ class QueueManager  {
 const manager = new QueueManager();
 
 module.exports = (file, data, options) => {
-    const json = (typeof data === 'string') ? data : JSON.stringify(data);
+    const json = (typeof data === 'string' || data instanceof Buffer) ? data : JSON.stringify(data);
     const path = p.resolve(file);
 
     return new Promise((resolve, reject) => {
