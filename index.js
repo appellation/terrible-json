@@ -3,7 +3,7 @@ const p = require('path');
 const lockfile = require('proper-lockfile');
 const queue = require('queue');
 
-class QueueManager  {
+const manager = new class {
     constructor()   {
         this.queues = new Map();
     }
@@ -25,9 +25,7 @@ class QueueManager  {
             q.once('error', () => this.queues.delete(path));
         }
     }
-}
-
-const manager = new QueueManager();
+};
 
 module.exports = (file, data, options = { encoding: 'utf8' }) => {
     const path = p.resolve(file);
