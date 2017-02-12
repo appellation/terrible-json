@@ -35,8 +35,8 @@ module.exports = (file, data, options) => {
     return new Promise((resolve, reject) => {
         manager.add(path, cb => {
             fs.writeFile(path, json, (err) => {
-                if(err) return reject(err);
-                resolve();
+                if(err) reject(err);
+                else resolve();
                 cb();
             });
         });
