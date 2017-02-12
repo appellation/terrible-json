@@ -29,8 +29,7 @@ class QueueManager  {
 
 const manager = new QueueManager();
 
-module.exports = (file, data, options) => {
-    const json = (typeof data === 'string' || data instanceof Buffer) ? data : JSON.stringify(data);
+module.exports = (file, data, options = { encoding: 'utf8' }) => {
     const path = p.resolve(file);
 
     return new Promise((resolve, reject) => {
@@ -38,13 +37,19 @@ module.exports = (file, data, options) => {
             lockfile.lock(path, (err, release) => {
                 if(err) return reject(err);
 
-                fs.writeFile(path, json, (err) => {
+                // read/write depending on arguments
+                if(typeof data !== 'undefined')
+                    fs.writeFile(path, (typeof data === 'string' || data instanceof Buffer) ? data : JSON.stringify(data), options, complete);
+                else
+                    fs.readFile(path, options, complete);
+
+                function complete(err, data) {
                     if(err) reject(err);
-                    else resolve();
+                    else resolve(data);
 
                     release();
                     cb();
-                });
+                }
             });
         });
     });
