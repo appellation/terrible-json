@@ -50,8 +50,8 @@ function accessFile(inc, socket, type) {
             if(type === 'write') {
                 if(inc.data instanceof ReadableStream) {
                     const write = fs.createWriteStream(inc.path, inc.options);
-                    write.on('end', () => complete());
-                    inc.data.pipe(write, inc.options);
+                    write.once('finish', () => complete());
+                    inc.data.pipe(write);
                 } else {
                     const toWrite = (typeof inc.data === 'string' || inc.data instanceof Buffer) ? inc.data : JSON.stringify(inc.data);
                     fs.writeFile(inc.path, toWrite, inc.options, complete);
