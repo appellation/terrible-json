@@ -6,6 +6,7 @@ const resolutions = new Map();
 
 ipc.config.id = process.pid;
 ipc.config.silent = true;
+
 ipc.connectTo('terrible_json', () => {
     ipc.of.terrible_json.on(
         'complete',
@@ -31,7 +32,7 @@ ipc.connectTo('terrible_json', () => {
 module.exports = (file, data, options = { encoding: 'utf8'}) => {
     const thisID = uuid.v4();
     ipc.of.terrible_json.emit(
-        (typeof data !== 'undefined') ? 'write' : 'read',
+        (typeof data === 'undefined') ? 'read' : 'write',
         {
             id: thisID,
             path: file,
@@ -44,4 +45,5 @@ module.exports = (file, data, options = { encoding: 'utf8'}) => {
         resolutions.set(thisID, { resolve, reject });
     });
 };
+
 module.exports.init = () => fork('./process');
