@@ -1,5 +1,5 @@
 const ipc = require('node-ipc');
-require('./process');
+const {fork} = require('child_process');
 
 ipc.config.id = process.pid;
 ipc.connectTo('terrible_json');
@@ -9,7 +9,7 @@ let id = 0;
 module.exports = (file, data, options = { encoding: 'utf8'}) => {
     const thisID = id++;
     ipc.of.terrible_json.emit(
-        data ? 'write' : 'read',
+        typeof data === 'undefined' ? 'write' : 'read',
         {
             id: thisID,
             path: file,
@@ -27,3 +27,4 @@ module.exports = (file, data, options = { encoding: 'utf8'}) => {
         )
     });
 };
+module.exports.init = () => fork('./process');

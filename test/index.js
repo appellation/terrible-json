@@ -1,9 +1,8 @@
+const {fork} = require('child_process');
 const badJSON = require('../index');
+badJSON.init();
 
 setTimeout(() => {
-    badJSON('./test/bad.json', {lol: 'no'});
-    badJSON('./test/bad.json', {lol: 'maybe'});
-    badJSON('./test/bad.json').then(console.log);
-    badJSON('./test/bad.json', {lmao: 'memes'});
-    badJSON('./test/bad.json').then(console.log);
+    fork('./test/op');
+    fork('./test/op');
 }, 5000);

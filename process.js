@@ -1,10 +1,8 @@
-/**
- * Created by Will on 2/22/2017.
- */
 const ipc = require('node-ipc');
 const fs = require('fs');
 const lockfile = require('proper-lockfile');
 const queue = require('queue');
+const {ReadableStream} = require('stream');
 
 const queues = new Map();
 
@@ -49,11 +47,20 @@ function accessFile(inc, socket, type) {
         lockfile.lock(inc.path, (err, release) => {
             if(err) return emitError(socket, err);
             // read/write depending on arguments
-            if(type === 'write')
-                fs.writeFile(inc.path, (typeof inc.data === 'string' || inc.data instanceof Buffer) ? inc.data : JSON.stringify(inc.data), inc.options, complete);
+            if(type === 'write') {
+                if(inc.data instanceof ReadableStream) {
+                    const write = fs.createWriteStream(inc.path, inc.options);
+                    write.on('end', () => complete());
+                    inc.data.pipe(write, inc.options);
+                } else {
+                    const toWrite = (typeof inc.data === 'string' || inc.data instanceof Buffer) ? inc.data : JSON.stringify(inc.data);
+                    fs.writeFile(inc.path, toWrite, inc.options, complete);
+                }
+            }
             else if(type === 'read')
                 fs.readFile(inc.path, inc.options, complete);
-            else emitError(socket, new Error(`Invalid operation type specified: ${type}`));
+            else
+                complete(new Error(`Invalid operation type specified: ${type}`));
 
             function complete(err, result) {
                 release();
