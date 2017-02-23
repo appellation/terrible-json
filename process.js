@@ -2,7 +2,7 @@ const ipc = require('node-ipc');
 const fs = require('fs');
 const lockfile = require('proper-lockfile');
 const queue = require('queue');
-const {ReadableStream} = require('stream');
+const {Readable: ReadableStream} = require('stream');
 
 const queues = new Map();
 
@@ -45,49 +45,55 @@ function accessFile(inc, socket, type) {
 
     addToQueue(inc.path, cb => {
         lockfile.lock(inc.path, (err, release) => {
-            if(err) return emitError(socket, err);
-            // read/write depending on arguments
-            if(type === 'write') {
-                if(inc.data instanceof ReadableStream) {
-                    const write = fs.createWriteStream(inc.path, inc.options);
-                    write.once('finish', () => complete());
-                    inc.data.pipe(write);
-                } else {
-                    const toWrite = (typeof inc.data === 'string' || inc.data instanceof Buffer) ? inc.data : JSON.stringify(inc.data);
-                    fs.writeFile(inc.path, toWrite, inc.options, complete);
+            if(err) return emitError(err);
+
+            try {
+                if(type === 'write') {
+                    if(inc.data instanceof ReadableStream) {
+                        const write = fs.createWriteStream(inc.path, inc.options);
+                        write.once('finish', () => complete());
+                        inc.data.pipe(write);
+                    } else {
+                        const toWrite = (typeof inc.data === 'string' || inc.data instanceof Buffer) ? inc.data : JSON.stringify(inc.data);
+                        fs.writeFile(inc.path, toWrite, inc.options, complete);
+                    }
                 }
+                else if(type === 'read') {
+                    fs.readFile(inc.path, inc.options, complete);
+                } else
+                    complete(new Error(`Invalid operation type specified: ${type}`));
+            } catch(e) {
+                complete(e);
             }
-            else if(type === 'read')
-                fs.readFile(inc.path, inc.options, complete);
-            else
-                complete(new Error(`Invalid operation type specified: ${type}`));
 
             function complete(err, result) {
                 release();
                 cb();
 
-                if(err) return emitError(socket, err);
+                if(err) return emitError(err);
 
                 ipc.server.emit(
                     socket,
                     'complete',
                     {
                         id: inc.id,
-                        data: result,
-                        path: inc.path
+                        data: result
+                    }
+                );
+            }
+
+            function emitError(err) {
+                ipc.server.emit(
+                    socket,
+                    'error',
+                    {
+                        id: inc.id,
+                        error: err
                     }
                 );
             }
         });
     });
-}
-
-function emitError(socket, err) {
-    ipc.server.emit(
-        socket,
-        'error',
-        err
-    );
 }
 
 ipc.server.start();
