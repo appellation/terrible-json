@@ -1,0 +1,7 @@
+{
+	"extends": [
+		"aqua/node",
+		"plugin:import/errors",
+		"plugin:import/warnings"
+	]
+}

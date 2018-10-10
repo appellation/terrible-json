@@ -10,14 +10,20 @@
     "type": "git",
     "url": "git+https://github.com/appellation/terrible-json.git"
   },
-  "author": "Will Nelson <appellation@topkek.pw>",
+  "author": "Will Nelson <will@pleb.xyz>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/appellation/terrible-json/issues"
   },
   "homepage": "https://github.com/appellation/terrible-json#readme",
   "dependencies": {
-    "proper-lockfile": "^2.0.0",
-    "queue": "^4.0.0"
+    "fs-nextra": "^0.3.7",
+    "proper-lockfile": "^3.0.2",
+    "semaphore": "^1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.1",
+    "eslint-config-aqua": "^4.4.1",
+    "eslint-plugin-import": "^2.14.0"
   }
 }
